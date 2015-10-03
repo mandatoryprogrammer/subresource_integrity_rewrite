@@ -70,8 +70,8 @@ def get_integrity_hash( url ):
     if str( url ).startswith( '://' ):
         url = 'http' + url
     response = requests.get( url )
-    hash_digest = hashlib.sha256( response.content ).digest()
-    sig = 'sha256-' + base64.b64encode( hash_digest )
+    hash_digest = hashlib.sha384( response.content ).digest()
+    sig = 'sha384-' + base64.b64encode( hash_digest )
     memoized_sha256_hashes[ url ] = sig
     return sig
 
