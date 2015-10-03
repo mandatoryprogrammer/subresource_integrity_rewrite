@@ -47,6 +47,7 @@ def get_sri_protected_html( soup ):
         old_stylesheet = str( stylesheet )
         new_stylesheet = stylesheet
         new_stylesheet['integrity'] = get_integrity_hash( stylesheet.get( 'href' ) )
+        new_stylesheet['crossorigin'] = 'anonymous'
         return_html = return_html.replace( old_stylesheet, str( new_stylesheet ) )
 
     scripts = soup.findAll( 'script' )
@@ -56,6 +57,7 @@ def get_sri_protected_html( soup ):
         old_script = str( script )
         new_script = script
         new_script['integrity'] = get_integrity_hash( script.get( 'src' ) )
+        new_script['crossorigin'] = 'anonymous'
         return_html = return_html.replace( old_script, str( new_script ) )
 
     return return_html
