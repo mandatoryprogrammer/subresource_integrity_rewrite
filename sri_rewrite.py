@@ -9,7 +9,7 @@ import sys
 import os
 
 # Key is URI, value is hash
-memoized_sha256_hashes = {}
+memoized_hashes = {}
 
 def get_recursive_file_list( directory, extension ):
     return [ os.path.join(dp, f) for dp, dn, filenames in os.walk( directory ) for f in filenames if os.path.splitext(f)[1] == '.' + extension ]
@@ -63,16 +63,18 @@ def get_sri_protected_html( soup ):
     return return_html
 
 def get_integrity_hash( url ):
-    if url in memoized_sha256_hashes:
-        return memoized_sha256_hashes[ url ]
+    request_headers = {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.101 Safari/537.36',
+    }
+    if url in memoized_hashes:
+        return memoized_hashes[ url ]
     if str( url ).startswith( '//' ):
         url = 'http:' + url
     if str( url ).startswith( '://' ):
         url = 'http' + url
-    response = requests.get( url )
-    hash_digest = hashlib.sha384( response.content ).digest()
-    sig = 'sha384-' + base64.b64encode( hash_digest )
-    memoized_sha256_hashes[ url ] = sig
+    response = requests.get( url, headers=request_headers )
+    sig = 'sha384-' + base64.b64encode( hashlib.sha384( response.content ).digest() ) + ' sha256-' + base64.b64encode( hashlib.sha256( response.content ).digest() )
+    memoized_hashes[ url ] = sig
     return sig
 
 if len( sys.argv ) == 2:
